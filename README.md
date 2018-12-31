@@ -125,6 +125,7 @@ import { Redirect } from 'react-router-dom'
 
 render () {
   let redirect = null
+  // submitted 在按下提交后设置为true
   if(this.state.submitted) {
     redirect = <Redirect to="/posts" />  
   }
@@ -132,4 +133,32 @@ render () {
     {redirect}
     )
 }
+```
+
+# 使用历史Prop 重定向(replace) 某个方法后，改变路由, 替换上面的办法
+- this.props.history.push('/posts')
+newPost.js
+```
+  this.props.history.push('/posts') 或者
+  this.props.history.replace('/posts')
+
+  // 直接在按下提交按钮后， 重定向
+```
+
+# 导航守卫
+- 你不知道用户有没有权限
+如果路由没render,你can't reach that route
+
+```
+state = {
+  auth: false
+}
+this.state.auth ? <Route path="/new-post" component={NewPost} /> : null
+```
+
+# 处理404
+
+```
+<Route render={() => <h1>Not found</h1>}
+
 ```
