@@ -11,6 +11,103 @@ render () {
     )
 }
 ```
+# Link
+页面发送一个请求，获得一个新的页面
+- 当点击link的时候，不要reload页面,不会丢失state
+- 不发请求，用js reload
+```
+<Link to="/">Home</Link>
+<Link to="{{
+  pathname: '/new',
+  hash: '#submit',
+  search: '?quick-submit=true'
+}}">Home</Link>
+<Link to={props.match.url + '/new'}></Link> 相对路径
+
+```
+# 添加高亮
+```
+<NavLink to="/" exact>home</NavLink>
+```
+- 用自定义高亮
+```
+<NavLink 
+  to="/" 
+  exact 
+  activeClassName="my-active" // 自定义class
+  activeStyle={{ // 行内样式
+    color: '#58a'
+  }}
+  >home</NavLink>
+
+```
+# 传递路由参数
+```
+<Route path='/new-post' component={NewPost} />
+<Route path='/:id' exact component={Posts} />
+// Link
+render () {
+  let posts = <p>出错</p>
+  if(!this.state.error) {
+    posts = this.state.posts.map(post => {
+      return (
+          <Link to={'/' + post.id}>
+          
+          </Link>
+      )
+    })
+  }
+}
+<Link to={'/} + post.id> </Link>
+```
+# 拿到路由参数
+```
+componentDidMount() {
+  console.log(this.props)
+  if(this.props.match.params.id) {
+    // 请求数据
+  }
+}
+```
+
+# 拿到query参数
+```
+<Link to="/my-path?start=5">Go to Start</Link> or
+<Link 
+    to={‌{
+        pathname: '/my-path',
+        search: '?start=5'
+    }}
+    >Go to Start</Link>
+
+props.location.search 可以拿到 But that will only give you something like ?start=5 
+
+拿到 key-value
+componentDidMount() {
+    const query = new URLSearchParams(this.props.location.search);
+    for (let param of query.entries()) {
+        console.log(param); // yields ['start', '5']
+    }
+}
+```
+Vanilla JS is a joke，就是指原生JS
+URLSearchParams  is a built-in object, shipping with vanilla JavaScript. It returns an object, which exposes the entries()  method. entries()  returns an Iterator - basically a construct which can be used in a for...of...  loop (as shown above).
+
+```
+<Link to="/my-path#start-position">Go to Start</Link> 
+
+or
+
+<Link 
+    to={‌{
+        pathname: '/my-path',
+        hash: 'start-position'
+    }}
+    >Go to Start</Link>
+React router makes it easy to extract the fragment. You can simply access props.location.hash
+```
+
+
 ## Swicth 只加载一个路由 按先后顺序
 ## NavLink 点击跳转的按钮
 ## exact
