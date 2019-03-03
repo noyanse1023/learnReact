@@ -31,9 +31,9 @@ render () {
 ```
 - 用自定义高亮
 ```
-<NavLink 
-  to="/" 
-  exact 
+<NavLink
+  to="/"
+  exact
   activeClassName="my-active" // 自定义class
   activeStyle={{ // 行内样式
     color: '#58a'
@@ -52,7 +52,7 @@ render () {
     posts = this.state.posts.map(post => {
       return (
           <Link to={'/' + post.id}>
-          
+
           </Link>
       )
     })
@@ -73,14 +73,14 @@ componentDidMount() {
 # 拿到query参数
 ```
 <Link to="/my-path?start=5">Go to Start</Link> or
-<Link 
+<Link
     to={‌{
         pathname: '/my-path',
         search: '?start=5'
     }}
     >Go to Start</Link>
 
-props.location.search 可以拿到 But that will only give you something like ?start=5 
+props.location.search 可以拿到 But that will only give you something like ?start=5
 
 拿到 key-value
 componentDidMount() {
@@ -94,11 +94,11 @@ Vanilla JS is a joke，就是指原生JS
 URLSearchParams  is a built-in object, shipping with vanilla JavaScript. It returns an object, which exposes the entries()  method. entries()  returns an Iterator - basically a construct which can be used in a for...of...  loop (as shown above).
 
 ```
-<Link to="/my-path#start-position">Go to Start</Link> 
+<Link to="/my-path#start-position">Go to Start</Link>
 
 or
 
-<Link 
+<Link
     to={‌{
         pathname: '/my-path',
         hash: 'start-position'
@@ -308,6 +308,186 @@ URLstring 必须，一个字符串，含有 URI 组件或其他要编码的文�
 const aux = (props) => props.children
 
 export default aux
+```
+
+# 验证表单
+## 把 input 封装为一个 UI 组件
+- **使用**
+```
+state = {
+    orderForm: {
+        name: {
+            elementType: 'input',
+            elementConfig: {
+                type: 'text',
+                placeholder: 'Your Name'
+            },
+            value: ''
+        },
+        email: {
+            elementType: 'input',
+            elementConfig: {
+                type: 'email',
+                placeholder: 'Your Mail'
+            },
+            value: ''
+        },
+        deliveryMethod: {
+            elementType: 'select',
+            elementConfig: {
+                options: [{
+                    value: 'fastest',
+                    displayValue: 'Fastest'
+                },{
+                    value: 'cheapest',
+                    displayValue: 'Cheapest'
+                }]
+            },
+            value: ''
+        }
+    }
+}
+
+const formElementsArray = []
+for (let key in this.state.orderForm) {
+    formElementsArray.push({
+        id: key,
+        config: this.state.orderForm[key]
+    })
+}
+<form onSubmit={this.orderHandler}>
+    {formElementsArray.map(formElement => (
+        <Input
+            key={formElement.id}
+            elementType={formElement.config.elementType}
+            elementConfig={formElement.config.elementConfig}
+            value={formElement.config.value}
+            changed={(e) => this.inputChangedHandler(e, formElement.id)} />
+    ))}
+    <Button btnType="Success">ORDER</Button>
+</form>
+```
+- **Input.js**:
+```
+import React from 'react'
+import classes from './Input.css'
+
+const input = (props) => {
+    let inputElement = null
+
+    switch (props.elementType) {
+        case ('input'):
+            inputElement = <input
+                className={classes.InputElement}
+                {...props.elementConfig}
+                value={props.value}
+                onChange={props.changed}/>
+            break
+        case ('textearea'):
+            inputElement = <textearea
+                className={classes.InputElement}
+                {...props.elementConfig}
+                value={props.value}
+                onChange={props.changed}/>
+            break
+        case ('select'):
+            inputElement = (
+                <select
+                    className={classes.InputElement}
+                    value={props.value}
+                    onChange={props.changed}>
+                    {props.elementConfig.options.map(option => (
+                        <option
+                            key={option.value}
+                            value={option.value}>
+                            {option.displayValue}
+                        </option>
+                    ))}
+                </select>
+            )
+            break
+        default:
+            inputElement = <input className={classes.InputElement} {...props.elementConfig} value={props.value} />
+    }
+    return (
+        <div className={classes.Input}>
+            <label className={classes.Label}>{props.label}</label>
+            {inputElement}
+        </div>
+    )
+}
+
+export default input
+
+```
+
+## Form Validation 表单验证
+- 在数据中添加 是否验证的规则 以及 验证的结果  `validation: { required: true, minLength: 5 }, valid: false`
+```
+state = {
+    orderForm: {
+        name: {
+            elementType: 'input',
+            elementConfig: {
+                type: 'text',
+                placeholder: 'Your Name'
+            },
+            value: '',
+            validation: {
+                required: true,
+                minLength: 5,
+                maxLength: 10
+            },
+            valid: false
+        },
+        email: {
+            elementType: 'input',
+            elementConfig: {
+                type: 'email',
+                placeholder: 'Your Mail'
+            },
+            value: '',
+            validation: {
+                required: true
+            },
+            valid: false
+
+        },
+        deliveryMethod: {
+            elementType: 'select',
+            elementConfig: {
+                options: [{
+                    value: 'fastest',
+                    displayValue: 'Fastest'
+                },{
+                    value: 'cheapest',
+                    displayValue: 'Cheapest'
+                }]
+            },
+            value: ''
+        }
+    }
+}
+```
+- 添加验证的函数
+```
+checkValidity(value, rules) { // 返回布尔值
+    let isValid = false
+    if (rules.required) {
+        isValid = value.trim() !== ''
+    }
+    if (rules.minLength) {
+        isValid = value.length >= rules.minLength
+    }
+    if (rules.maxLength) {
+        isValid = value.length <= rules.maxLength
+    }
+    return isValid
+}
+inputChangedHandler = (e, id) => {
+    updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedOrderForm.validation)
+    console.log(orderForm)
+}
 ```
 
 # Redux 独立于react
